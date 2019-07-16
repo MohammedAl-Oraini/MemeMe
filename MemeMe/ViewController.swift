@@ -48,9 +48,13 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         setupUI()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        shareButton.isEnabled = imagePickerView.image != nil
+    }
+    
     func setupUI() {
         cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
-        shareButton.isEnabled = imagePickerView.image != nil
         topTextField.defaultTextAttributes = memeTextAttributes
         bottomTextField.defaultTextAttributes = memeTextAttributes
         topTextField.textAlignment = .center
