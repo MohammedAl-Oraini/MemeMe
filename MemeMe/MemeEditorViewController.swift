@@ -161,6 +161,8 @@ class MemeEditorViewController: UIViewController {
     }
 }
 
+//MARK:- Adding the UIImagePickerControllerDelegate and UINavigationControllerDelegate and thier methods
+
 extension MemeEditorViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     //MARK:- handling the picked image
@@ -178,7 +180,7 @@ extension MemeEditorViewController: UIImagePickerControllerDelegate, UINavigatio
     }
     
     func presentPickerViewController(source: UIImagePickerController.SourceType) {
-        //TODO: - Create a `UIImagePickerController`, set its source, and present it here.
+
         let imagePicker = UIImagePickerController()
         imagePicker.delegate = self
         imagePicker.sourceType = source
@@ -186,6 +188,8 @@ extension MemeEditorViewController: UIImagePickerControllerDelegate, UINavigatio
     }
     
 }
+
+//MARK:- Adding the UITextFieldDelegate and its methods
 
 extension MemeEditorViewController: UITextFieldDelegate {
     
