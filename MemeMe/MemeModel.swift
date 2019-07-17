@@ -6,7 +6,6 @@
 //  Copyright © 2019 Mohammad Al-Oraini. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
 //MARK:- defining the Meme Model

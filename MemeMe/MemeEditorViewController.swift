@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  MemeEditorViewController.swift
 //  MemeMe
 //
 //  Created by Mohammad Al-Oraini on 16/07/2019.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigationControllerDelegate,UITextFieldDelegate {
+class MemeEditorViewController: UIViewController {
     
     //MARK:- IBOutlets of the app
 
@@ -26,10 +26,10 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     //MARK:- The memeTextAttributes that will be uesed in the app
     
     let memeTextAttributes: [NSAttributedString.Key: Any] = [
-        NSAttributedString.Key.strokeColor: UIColor.black,
-        NSAttributedString.Key.foregroundColor: UIColor.white,
-        NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!,
-        NSAttributedString.Key.strokeWidth: -5.0
+        .strokeColor: UIColor.black,
+        .foregroundColor: UIColor.white,
+        .font: UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!,
+        .strokeWidth: -5.0
         
     ]
     
@@ -41,10 +41,6 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        topTextField.delegate = self
-        bottomTextField.delegate = self
-        
         setupUI()
     }
     
@@ -55,41 +51,26 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     
     func setupUI() {
         cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
-        topTextField.defaultTextAttributes = memeTextAttributes
-        bottomTextField.defaultTextAttributes = memeTextAttributes
-        topTextField.textAlignment = .center
-        bottomTextField.textAlignment = .center
+        setupTextField(topTextField, text: "TOP")
+        setupTextField(bottomTextField, text: "BOTTOM")
     }
     
-    
-    //MARK:- handling the picked image
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        
-        if let image = info[.originalImage] as? UIImage {
-            imagePickerView.image = image
-        }
-        dismiss(animated: true, completion: nil)
+    func setupTextField(_ textField:UITextField, text: String) {
+        textField.delegate = self
+        textField.defaultTextAttributes = memeTextAttributes
+        textField.textAlignment = .center
+        textField.text = text
     }
     
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        dismiss(animated: true, completion: nil)
-    }
-    
+
     //MARK:- IBActions of the app
 
     @IBAction func pickAnImageFromAlbum(_ sender: UIBarButtonItem) {
-        let imagePicker = UIImagePickerController()
-        imagePicker.delegate = self
-        imagePicker.sourceType = .photoLibrary
-        present(imagePicker, animated: true, completion: nil)
+        presentPickerViewController(source: .photoLibrary)
     }
     
     @IBAction func pickAnImageFromCamera(_ sender: UIBarButtonItem) {
-        let imagePicker = UIImagePickerController()
-        imagePicker.delegate = self
-        imagePicker.sourceType = .camera
-        present(imagePicker, animated: true, completion: nil)
+        presentPickerViewController(source: .camera)
     }
     
     
@@ -97,9 +78,12 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         
         let memeImage = generateMemedImage()
         let controller = UIActivityViewController(activityItems: [memeImage], applicationActivities: nil)
-        present(controller, animated: true) {
-            self.save()
+        controller.completionWithItemsHandler = { (activity, completed, items, error) in
+            if completed {
+                self.save()
+            }
         }
+        present(controller, animated: true)
         
     }
     
@@ -142,30 +126,7 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
         return keyboardSize.cgRectValue.height
     }
     
-    //MARK:- handling the textFields
-    
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        // need this so the fram only shift with bottom text field
-        if textField == bottomTextField {
-            subscribeToKeyboardNotifications()
-        }
-        // so the user does not need to delete the defult text
-        if textField.text == "TOP" || textField.text == "BOTTOM" {
-            textField.text = ""
-        }
-    }
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        // to prevent memory leaks
-        if textField == bottomTextField {
-            unsubscribeFromKeyboardNotifications()
-        }
-    }
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        
-        textField.resignFirstResponder()
-        return true
-    }
+
     
     //MARK:- generateing the meme image
     
@@ -200,3 +161,56 @@ class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigat
     }
 }
 
+extension MemeEditorViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    //MARK:- handling the picked image
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        if let image = info[.originalImage] as? UIImage {
+            imagePickerView.image = image
+        }
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func presentPickerViewController(source: UIImagePickerController.SourceType) {
+        //TODO: - Create a `UIImagePickerController`, set its source, and present it here.
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.sourceType = source
+        present(imagePicker, animated: true, completion: nil)
+    }
+    
+}
+
+extension MemeEditorViewController: UITextFieldDelegate {
+    
+    //MARK:- handling the textFields
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        // need this so the fram only shift with bottom text field
+        if textField == bottomTextField {
+            subscribeToKeyboardNotifications()
+        }
+        // so the user does not need to delete the defult text
+        if textField.text == "TOP" || textField.text == "BOTTOM" {
+            textField.text = ""
+        }
+    }
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        // to prevent memory leaks
+        if textField == bottomTextField {
+            unsubscribeFromKeyboardNotifications()
+        }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        
+        textField.resignFirstResponder()
+        return true
+    }
+}
