@@ -19,6 +19,4 @@ struct Meme {
     
 }
 
-//MARK:- setting up the array for the save func
 
-var memes = [Meme]()

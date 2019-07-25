@@ -92,6 +92,7 @@ class MemeEditorViewController: UIViewController {
         bottomTextField.text = defult.bottomText
         imagePickerView.image = defult.originalImage
         shareButton.isEnabled = false
+        dismiss(animated: true, completion: nil)
     }
     
     //MARK:- handling the keyboard placment
@@ -157,7 +158,8 @@ class MemeEditorViewController: UIViewController {
             return
         }
         let meme = Meme(topText: topTextField.text!, bottomText: bottomTextField.text!, originalImage: image, memedImage: generateMemedImage())
-        memes.append(meme)
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.memes.append(meme)
     }
 }
 
